@@ -82,7 +82,7 @@ void LinuxStatsCore::updateSystemInfo()
 
 
 
-    qDebug() << "Linux update system information";
+    //qDebug() << "Linux update system information";
     QRegularExpression rx;
 
     // update utilization
@@ -122,21 +122,10 @@ void LinuxStatsCore::updateSystemInfo()
     if(this->curCpuTime == 0) // hasn't updated for the first time
         this->systemModel_->setData(this->systemModel_->index(StatsCore::Utilization), 0);
 
-    // update temperature
-    QFile inputFile("/sys/class/hwmon/hwmon0/temp1_input");
-    if(inputFile.open(QIODevice::ReadOnly))
-    {
-        QString content(inputFile.readAll());
-        if(!content.isEmpty())
-            this->systemModel_->setData(this->systemModel_->index(StatsCore::DynamicSystemField::Temperature), QString::number(content.trimmed().toInt() / 1000.0, 'f', 1));
-        inputFile.close();
-    }
-    else
-    {
-        // TODO: some system doesn't have this file, consider alternative solution
-        this->systemModel_->setData(this->systemModel_->index(StatsCore::DynamicSystemField::Temperature), "No Data");
-        qWarning("Cannot open /sys/class/hwmon/hwmon0/temp1_input for statistics");
-    }
+    // update cpu temperature
+    this->systemModel_->setData(this->systemModel_->index(StatsCore::DynamicSystemField::Temperature), tc.getCpuTemp());
+
+    qWarning() << "GPU temp:" << tc.getGpuTemp();
 
     // update memory information
     QFile meminfo("/proc/meminfo");
