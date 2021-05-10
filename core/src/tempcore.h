@@ -6,11 +6,13 @@
 
 class tempCore
 {
+private:
+    QMap<QString, QMap<int, QString>> data;
+    void writer(const QString &str);
 public:
     tempCore();
-    //static QString init();
-private:
-    QMap<QString, QString> data;
+    QString getCpuTemp();
+    QString getGpuTemp();
 };
 
 #endif // TEMPCORE_H
