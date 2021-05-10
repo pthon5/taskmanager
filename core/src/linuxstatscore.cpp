@@ -1,11 +1,18 @@
 #if defined(unix) || defined(__unix__) || defined(__unix)
 #include "linuxstatscore.h"
+#include "hardwareinfo.h"
+#include "tempcore.h"
 #include <QFile>
 #include <QDebug>
 #include <QStringListModel>
 #include <QRegularExpression>
 #include <QTime>
 #include <QDir>
+#include <stdio.h>
+#include <string>
+
+//init tempCore
+tempCore tc;
 
 LinuxStatsCore::LinuxStatsCore(int msec, QObject *parent)
     :GenericStatsCore(msec, parent)
@@ -60,13 +67,21 @@ void LinuxStatsCore::gatherStaticInformation()
     // best we can do is:
     // > sudo lshw -short -C memory
     // > sudo dmidecode --type memory
-    this->staticSystemInfo_[StatsCore::StaticSystemField::MemorySpeed] = "No Data";
-    this->staticSystemInfo_[StatsCore::StaticSystemField::MemorySockets] = "No Data";
+
+    const QString &speed = hardwareInfo::getMemSpeed();
+    const QString &sockets = hardwareInfo::getMemSockets();
+
+    this->staticSystemInfo_[StatsCore::StaticSystemField::MemorySpeed] = speed;
+    this->staticSystemInfo_[StatsCore::StaticSystemField::MemorySockets] = sockets;
     return;
 }
 
+
 void LinuxStatsCore::updateSystemInfo()
 {
+
+
+
     qDebug() << "Linux update system information";
     QRegularExpression rx;
 
@@ -134,11 +149,13 @@ void LinuxStatsCore::updateSystemInfo()
         this->systemModel_->setData(this->systemModel_->index(StatsCore::DynamicSystemField::UsedMemory), rx.match(content).captured(1).toULongLong() * 1024);
         rx.setPattern("Buffers:\\s+([0-9]+) kB");
         this->systemModel_->setData(this->systemModel_->index(StatsCore::DynamicSystemField::CachedMemory), rx.match(content).captured(1).toULongLong() * 1024);
+        //this->systemModel_->setData(this->systemModel_->index(StatsCore::StaticSystemField::MemorySpeed), 2400);
         meminfo.close();
     }
     else
         qWarning("Cannot open /proc/meminfo for statistics");
 
+    //cpu speed
     QFile cpuinfo("/proc/cpuinfo");
     if(cpuinfo.open(QIODevice::ReadOnly))
     {
