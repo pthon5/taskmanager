@@ -2,6 +2,7 @@
 #include "linuxstatscore.h"
 #include "hardwareinfo.h"
 #include "tempcore.h"
+#include "additem.h"
 #include <QFile>
 #include <QDebug>
 #include <QStringListModel>
@@ -10,13 +11,16 @@
 #include <QDir>
 #include <stdio.h>
 #include <string>
+#include <thread>
 
 //init tempCore
 tempCore tc;
+hardwareInfo hwinfo;
 
 LinuxStatsCore::LinuxStatsCore(int msec, QObject *parent)
     :GenericStatsCore(msec, parent)
 {
+    //Globalparent.setParent(parent->parent());
     this->curCpuTime = this->curCpuUseTime = this->lastCpuTime = this->lastCpuUseTime = 0;
 }
 
@@ -32,6 +36,9 @@ void LinuxStatsCore::updateProcesses()
 
 void LinuxStatsCore::gatherStaticInformation()
 {
+
+    addItem ai("0", 3);
+    //addItem("1", 3);
     qDebug() << "Gathering linux static information";
     // get total memory
     QFile meminfo("/proc/meminfo");
@@ -67,9 +74,8 @@ void LinuxStatsCore::gatherStaticInformation()
     // best we can do is:
     // > sudo lshw -short -C memory
     // > sudo dmidecode --type memory
-
-    const QString &speed = hardwareInfo::getMemSpeed();
-    const QString &sockets = hardwareInfo::getMemSockets();
+    const QString &speed = hwinfo.getMemSpeed();
+    const QString &sockets = hwinfo.getMemSockets();
 
     this->staticSystemInfo_[StatsCore::StaticSystemField::MemorySpeed] = speed;
     this->staticSystemInfo_[StatsCore::StaticSystemField::MemorySockets] = sockets;
@@ -77,10 +83,12 @@ void LinuxStatsCore::gatherStaticInformation()
 }
 
 
+ //
 void LinuxStatsCore::updateSystemInfo()
 {
 
 
+//addItem ai("asdasd",1);
 
     //qDebug() << "Linux update system information";
     QRegularExpression rx;
@@ -125,7 +133,6 @@ void LinuxStatsCore::updateSystemInfo()
     // update cpu temperature
     this->systemModel_->setData(this->systemModel_->index(StatsCore::DynamicSystemField::Temperature), tc.getCpuTemp());
 
-    qWarning() << "GPU temp:" << tc.getGpuTemp();
 
     // update memory information
     QFile meminfo("/proc/meminfo");

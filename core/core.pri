@@ -4,6 +4,7 @@ CONFIG   += c++11
 INCLUDEPATH += $$PWD/include
 
 SOURCES += $$PWD/src/statscore.cpp \
+    $$PWD/src/additem.cpp \
     $$PWD/src/hardwareinfo.cpp \
     $$PWD/src/linuxstatscore.cpp \
     $$PWD/src/macstatscore.cpp \
@@ -12,6 +13,7 @@ SOURCES += $$PWD/src/statscore.cpp \
 
 
 HEADERS  += $$PWD/include/statscore.h \
+    $$PWD/src/additem.h \
     $$PWD/src/hardwareinfo.h \
     $$PWD/src/linuxstatscore.h \
     $$PWD/src/macstatscore.h \

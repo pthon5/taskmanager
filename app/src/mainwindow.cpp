@@ -7,8 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    // setup StatsCore
-    this->core = StatsCore::createCore(1000);
+
 
     // setup local variables
     this->curSelectedPID = 0;
@@ -16,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowIcon(QIcon(":/icon.png"));
 
     ui->setupUi(this);
+    // setup StatsCore
+    this->core = StatsCore::createCore(1000, parent);
 
     QStringList staticInfo = core->staticInformation();
 
@@ -179,6 +180,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // connect list widget's signals to stack widget
     ui->usageOptionList->setIconSize(QSize(60,50));
     connect(ui->usageOptionList, &QListWidget::currentRowChanged, ui->stackedWidget, &QStackedWidget::setCurrentIndex);
+    ui->usageOptionList;
+
 }
 
 MainWindow::~MainWindow()
@@ -194,4 +197,8 @@ void MainWindow::updateUsageOptionIcon()
     QPixmap memoryPixmap = ui->memoryUsagePlot->toPixmap();
     memoryPixmap = memoryPixmap.copy(0, 18, memoryPixmap.width(), memoryPixmap.height() - 36);
     ui->usageOptionList->item(1)->setIcon(QIcon(memoryPixmap));
+}
+
+QListWidget* MainWindow::getQLW() {
+    return ui->usageOptionList;
 }

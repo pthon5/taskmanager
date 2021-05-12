@@ -1,6 +1,7 @@
 #pragma once
 #include "stable.h"
 #include "statscore.h"
+#include "QtWidgets"
 
 namespace Ui {
 class MainWindow;
@@ -19,6 +20,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void updateWidget(const QVariantList & property);
+    QListWidget* getQLW();
 private:
     Ui::MainWindow *ui;
 };
